@@ -33,7 +33,7 @@
   const SUM_FIELDS = ['spend', 'impressions', 'reach', 'clicks', 'results', 'conversations'];
   const REQUIRED_COLUMNS = ['day', 'campaign', 'ad', 'spend', 'impressions', 'reach', 'results'];
 
-  // El objetivo se deduce del nombre de la campana ("Interaccion | Posts | LR - Gasto total"). Es la agrupacion
+  // El objetivo se deduce del nombre de la campana ("Campaña mensajes | LR - 2026"). Es la agrupacion
   // del reporte: cada objetivo mide su propio resultado y los resultados no se suman entre objetivos.
   const OBJECTIVES = [
     // Nombres de la cuenta: "Campaña mensajes | LR - 2026", "Campaña reconocimiento de marca | LR",
@@ -299,9 +299,9 @@
       .sort((a, b) => a.key.localeCompare(b.key));
     const withData = months.filter(month => month.hasData);
     const latest = withData[withData.length - 1] || null;
-    // Meta no exporta los dias sin entrega: si la pauta estuvo apagada al inicio del mes (1 Oct) la descarga empieza
+    // Meta no exporta los dias sin entrega: si la pauta estuvo apagada al inicio del mes (1 Oct 2026) la descarga empieza
     // despues. Con datos en el mes anterior la cuenta ya corria, asi que el mes empieza el 1 y esos dias van en 0.
-    // Solo el primer mes con datos conserva su primer dia real (la pauta arranco el 15 Jun).
+    // Solo el primer mes con datos conserva su primer dia real (la descarga de Agosto 2026 empieza el 26).
     const byKey = new Map(months.map(month => [month.key, month]));
     months.forEach(month => {
       const before = new Date(month.year, month.month - 2, 1);
@@ -422,7 +422,7 @@
   }
 
   // Conjuntos de anuncios. Como los anuncios, un conjunto es su nombre dentro de un objetivo: asi se compara con
-  // el mes anterior aunque la campana cambie de nombre ("LR" -> "LR - Gasto total"). share es sobre las filas dadas.
+  // el mes anterior aunque la campana cambie de nombre ("Campaña mensajes | LR" -> "Campaña mensajes | LR - 2026"). share es sobre las filas dadas.
   function adSets(rows) {
     return rank(rows, row => `${row.group}|${normalize(row.adSet)}`, (key, items) => {
       const activeRows = items.filter(hasActivity);
@@ -522,7 +522,7 @@
     };
   }
 
-  // Vista anual: todos los meses del año con descarga ("1 Junio - 30 Septiembre"). No hay descargas del año
+  // Vista anual: todos los meses del año con descarga ("26 Agosto - 13 Octubre"). No hay descargas del año
   // anterior, asi que no lleva comparacion. Sin año, el del ultimo mes con datos.
   function yearPeriod(year) {
     const target = year == null ? state.data?.year : Number(year);

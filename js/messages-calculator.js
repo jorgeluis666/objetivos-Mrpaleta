@@ -6,11 +6,11 @@
     target: 10000,
     actual: 0,
     ticket: 100,
-    averageCpl: 2.5,
+    // Conjuntos de la campaña de mensajes de la cuenta; CPL cercano al de Septiembre 2026 (S/ 1.29 por conversacion).
+    averageCpl: 1.3,
     sets: [
-      { name: 'Campaña principal', messages: 100, cpl: 2.5 },
-      { name: 'Reservas de eventos', messages: 100, cpl: 2.5 },
-      { name: 'Remarketing', messages: 100, cpl: 2.5 },
+      { name: 'Conjunto mensajes Piura', messages: 100, cpl: 1.3 },
+      { name: 'Conjunto mensajes Chiclayo', messages: 100, cpl: 1.3 },
     ],
   };
 
@@ -318,7 +318,7 @@
           </Table>
         </Worksheet>
       </Workbook>`;
-    download('Calculadora_Mensajes_Terminal_Pesquero.xls', workbook, 'application/vnd.ms-excel;charset=utf-8');
+    download('Calculadora_Mensajes_Mr_Paleta.xls', workbook, 'application/vnd.ms-excel;charset=utf-8');
     feedback('Archivo Excel generado.');
   }
 

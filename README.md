@@ -4,7 +4,7 @@ Dashboard de Agencia Lima Retail para controlar la inversion publicitaria de Mr.
 la cuenta son los mensajes: las conversaciones iniciadas se miden en toda la cuenta, aparte de los resultados de
 cada objetivo.
 
-Version actual: `v1.0.0`.
+Version actual: `v1.0.1`.
 
 ## Versionado
 

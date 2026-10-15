@@ -140,7 +140,7 @@ async function main() {
   if (pagePassword) console.log('[build] dist/index.html cifrado con DASHBOARD_PASSWORD');
 
   copyBrandAssets();
-  // Dominio propio en GitHub Pages; va junto al sitio igual que en el tablero de Casiopia.
+  // Dominio propio en GitHub Pages (mrpaleta.limaretail.com); va junto al sitio.
   fs.copyFileSync(path.join(ROOT, 'CNAME'), path.join(DIST_DIR, 'CNAME'));
   // El tablero no se indexa: la pantalla de acceso ya trae noindex y esto cubre el resto del sitio.
   fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
