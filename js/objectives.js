@@ -48,7 +48,7 @@
   const KPIS = [
     { key: 'spend', label: 'Inversion', hint: 'Importe gastado', better: null, format: 'money', perMonth: true },
     { key: 'conversations', label: 'Conversaciones', hint: 'Conversaciones con mensajes iniciadas', better: 'up', format: 'count', perMonth: true },
-    { key: 'costPerConversation', label: 'Costo por conversacion', hint: 'Inversion de las campanas con conversaciones / conversaciones', better: 'down', format: 'unitCost' },
+    { key: 'costPerConversation', label: 'Costo por conversacion', hint: 'Inversion / conversaciones de las campanas de mensajes', better: 'down', format: 'unitCost' },
     { key: 'impressions', label: 'Impresiones', hint: 'Veces que se mostraron los anuncios', better: 'up', format: 'count', perMonth: true },
     { key: 'reach', label: 'Alcance', hint: 'Suma diaria por publico, como en el reporte', better: 'up', format: 'count', perMonth: true },
     { key: 'cpm', label: 'CPM prom.', hint: 'Costo por mil impresiones', better: 'down', format: 'money' },
@@ -253,7 +253,9 @@
     const average = period.annual ? monthlyAverage(period) : null;
     host.innerHTML = KPIS.map(kpi => {
       let note = `<small>${kpi.hint}</small>`;
-      if (previous) note = deltaHtml(current[kpi.key], previous[kpi.key], kpi.better, period.compare.label);
+      // Sin valor en el periodo (por ejemplo, ninguna campana de mensajes) queda la explicacion del indicador: "Sin dato
+      // en <mes anterior>" diria que el que falta es el otro.
+      if (previous && current[kpi.key] != null) note = deltaHtml(current[kpi.key], previous[kpi.key], kpi.better, period.compare.label);
       else if (average && kpi.perMonth) note = `<small title="${esc(average.basis)}">Prom. mensual: ${fmt(kpi.format, average[kpi.key])}</small>`;
       return `
       <div class="kpi-pill">

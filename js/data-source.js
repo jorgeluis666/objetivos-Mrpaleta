@@ -49,6 +49,8 @@
   // Un objetivo fuera de OBJECTIVES toma el siguiente color la primera vez que aparece y lo conserva: no cambia
   // entre meses, la vista anual ni los modulos.
   const otherColors = new Map();
+  // Tipo de resultado de las campanas de mensajes: solo su gasto entra en el costo por conversacion.
+  const CONVERSATION_RESULT = /conversaciones con mensajes/;
   const RESULT_LABELS = [
     { match: /interacciones con la publicacion/, label: 'Interacciones' },
     { match: /thruplay/, label: 'Reproducciones (ThruPlay)' },
@@ -346,16 +348,23 @@
       cpm: totals.impressions > 0 ? (spend / totals.impressions) * 1000 : null,
       ctr: totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : null,
       costPerResult: totals.results > 0 ? spend / totals.results : null,
-      // Solo con el gasto de las campanas que iniciaron conversaciones: el de reconocimiento o trafico lo inflaria.
-      costPerConversation: totals.conversations > 0 ? round2(totals.conversationSpend || 0) / totals.conversations : null,
+      // Solo con las campanas cuyo resultado son conversaciones: una de trafico que inicio una sola conversacion
+      // sumaria todo su gasto y lo inflaria.
+      costPerConversation: totals.messageConversations > 0 ? round2(totals.conversationSpend || 0) / totals.messageConversations : null,
     };
   }
 
   function summarize(rows) {
     const totals = emptyTotals();
     rows.forEach(row => { SUM_FIELDS.forEach(field => { totals[field] += row[field]; }); });
-    const talking = new Set(rows.filter(row => row.conversations > 0).map(row => row.campaign));
-    totals.conversationSpend = rows.reduce((sum, row) => sum + (talking.has(row.campaign) ? row.spend : 0), 0);
+    const talking = new Set(rows.filter(row => CONVERSATION_RESULT.test(normalize(row.resultType))).map(row => row.campaign));
+    totals.conversationSpend = 0;
+    totals.messageConversations = 0;
+    rows.forEach(row => {
+      if (!talking.has(row.campaign)) return;
+      totals.conversationSpend += row.spend;
+      totals.messageConversations += row.conversations;
+    });
     return withDerived(totals);
   }
 

@@ -4,7 +4,7 @@ Dashboard de Agencia Lima Retail para controlar la inversion publicitaria de Mr.
 la cuenta son los mensajes: las conversaciones iniciadas se miden en toda la cuenta, aparte de los resultados de
 cada objetivo.
 
-Version actual: `v1.0.1`.
+Version actual: `v1.0.2`.
 
 ## Versionado
 
@@ -61,7 +61,8 @@ Mr. Paleta".
   "reconocimiento" -> Reconocimiento de marca, "trafico al perfil" -> Trafico al perfil (IG), "locacion" ->
   Locacion. Una campana que no encaje toma el texto antes del primer `|` como objetivo.
 - Conversaciones: se suman en todas las campanas (una de locacion tambien puede iniciarlas). El costo por
-  conversacion usa solo el gasto de las campanas que iniciaron alguna, para que el de reconocimiento no lo infle.
+  conversacion usa solo las campanas cuyo resultado son conversaciones (las de mensajes): su gasto entre sus
+  conversaciones. Sin campana de mensajes en el periodo queda en "-".
 - El alcance es la suma de las filas de la descarga, igual que en los reportes de la agencia (no el alcance sin
   duplicar de Meta).
 
