@@ -4,6 +4,9 @@
 // DATA_FOLDER_ID: un Google Sheet por mes, descarga directa de Meta Ads ("Raw Data Report": una fila por
 // dia x edad x sexo x anuncio). Nombre: "Mr Paleta - Septiembre 2026".
 // REPORTS_FOLDER_ID: reportes (PDF / video) del modulo Archivo de Reportes.
+// VENTAS_SHEET_ID: la hoja que publica Nexus con las ventas del cliente, una fila por dia
+// (pestana 'Ventas Nexus', contrato NEXUS_VENTAS_V1 en la fila 2). Opcional: sin esta propiedad
+// el tablero no muestra el modulo Ventas y todo lo demas sigue igual.
 // GET ?action=data -> ultimo barrido | ?action=data&fresh=1 -> barrido en el momento (boton Actualizar).
 const TIMEZONE = 'America/Lima';
 const SWEEP_HOUR = 10;
@@ -14,6 +17,8 @@ const SNAPSHOT_NAME = 'Mr Paleta - barrido del tablero.json';
 // guardados con otra version se vuelven a leer aunque su archivo no haya cambiado.
 const SWEEP_VERSION = 2;
 const MANUAL_THROTTLE_MS = 60 * 1000;
+const VENTAS_TAB = 'Ventas Nexus';
+const VENTAS_CONTRACT = 'NEXUS_VENTAS_V1';
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MONTH_PATTERNS = [
   /\bene(?:ro)?\b/, /\bfeb(?:rero)?\b/, /\bmar(?:zo)?\b/, /\babr(?:il)?\b/, /\bmay(?:o)?\b/, /\bjun(?:io)?\b/,
@@ -51,7 +56,9 @@ function doGet(event) {
     // Una hoja subida o corregida despues del ultimo barrido se lee al abrir el tablero, sin esperar al
     // disparador de las 10:00 ni al boton Actualizar.
     else if (params.fresh !== '1' && changedSafely_(snapshot)) snapshot = sweep_('archivo nuevo');
-    return json_(Object.assign({ ok: true }, snapshot));
+    // Las ventas no viajan en el barrido: son una sola hoja pequena y Nexus la reescribe tres veces
+    // al dia, asi que leerla en cada peticion sale mas barato que invalidar el barrido entero.
+    return json_(Object.assign({ ok: true }, snapshot, { ventas: readVentasSafely_() }));
   } catch (error) {
     console.error(error);
     return json_({ ok: false, error: 'No se pudo leer la carpeta de datos.' });
@@ -375,6 +382,55 @@ function writeSnapshot_(snapshot) {
 
 function normalize_(value) {
   return String(value == null ? '' : value).normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+// Las ventas que publica Nexus. Nunca tumba el tablero: si falta la propiedad devuelve null y si
+// algo falla devuelve el error para que el modulo lo diga en vez de mostrar cifras a medias.
+function readVentasSafely_() {
+  try {
+    return readVentas_();
+  } catch (error) {
+    console.error(error);
+    return { error: 'No se pudo leer la hoja de ventas.' };
+  }
+}
+
+function readVentas_() {
+  const id = PropertiesService.getScriptProperties().getProperty('VENTAS_SHEET_ID');
+  if (!id) return null;
+  const sheet = SpreadsheetApp.openById(id).getSheetByName(VENTAS_TAB);
+  if (!sheet) return { error: 'La hoja de ventas no tiene la pestana ' + VENTAS_TAB + '.' };
+  const values = sheet.getDataRange().getDisplayValues();
+  const contract = values[1] || [];
+  // El contrato manda: si cambia de version, este lector se detiene en vez de leer columnas que ya
+  // no significan lo mismo.
+  if (String(contract[0] || '').trim() !== VENTAS_CONTRACT) {
+    return { error: 'Contrato desconocido en la hoja de ventas.' };
+  }
+  const columns = (values[2] || []).map(name => String(name || '').trim());
+  const rows = [];
+  for (let i = 3; i < values.length; i++) {
+    const row = values[i] || [];
+    if (!String(row[0] || '').trim()) continue;
+    const item = {};
+    columns.forEach((name, index) => {
+      if (!name) return;
+      const raw = String(row[index] == null ? '' : row[index]).trim();
+      // Vacio no es cero: el dia sin dato viaja como null y el modulo lo muestra como un hueco.
+      if (name === 'dia' || name === 'mes') item[name] = raw;
+      else if (name === 'cuadra') item[name] = raw === 'si';
+      else item[name] = raw === '' ? null : Number(raw.replace(',', '.'));
+    });
+    rows.push(item);
+  }
+  return {
+    capturedAt: String(contract[1] || ''),
+    account: String(contract[2] || ''),
+    currency: String(contract[3] || ''),
+    brand: String(contract[4] || ''),
+    columns,
+    rows,
+  };
 }
 
 function json_(payload) {

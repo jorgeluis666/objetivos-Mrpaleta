@@ -45,6 +45,12 @@
       source: 'Fuente: descargas de Meta Ads / carpeta Reportes de Drive',
       footer: 'La semana que acaba de pasar, lista cada lunes',
     },
+    'view-ventas': {
+      title: 'Ventas',
+      caption: 'Lo que el cliente anota, con la inversión',
+      source: 'Fuente: hoja de ventas del cliente, publicada por Nexus / Meta Ads',
+      footer: 'Un día sin dato se muestra como hueco, nunca como una venta de cero',
+    },
     'view-log': {
       title: 'Bitácora',
       caption: 'Cambios, comentarios y decisiones',
