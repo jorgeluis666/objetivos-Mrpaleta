@@ -133,18 +133,23 @@
       <small>${esc(note)}</small></div>`).join('')}</div>`;
   }
 
+  // El hueco del dia sin dato va con la clase de la casa (`no-data`), que lo pinta en gris pequeno:
+  // asi se distingue de un numero a simple vista y no parece un cero disfrazado.
+  const hueco = '<span class="no-data">—</span>';
+  const celda = (value, text) => `<td class="num">${value == null ? hueco : esc(text)}</td>`;
+
   function table(rows) {
     const f = fmt();
     const body = rows.map(row => `<tr>
-      <td>${esc(row.dia)}</td>
-      ${row.spend == null ? '<td class="num">—</td>' : `<td class="num">${esc(f.money(row.spend))}</td>`}
-      ${row.total_ventas == null ? '<td class="num">—</td>' : `<td class="num">${esc(f.count(row.total_ventas))}</td>`}
-      ${row.total_monto == null ? '<td class="num">—</td>' : `<td class="num">${esc(f.money(row.total_monto))}</td>`}
-      <td>${row.cuadra ? '' : 'mes sin cuadre'}</td>
+      <td class="date-col">${esc(row.dia)}</td>
+      ${celda(row.spend, f.money(row.spend))}
+      ${celda(row.total_ventas, f.count(row.total_ventas))}
+      ${celda(row.total_monto, f.money(row.total_monto))}
+      <td>${row.cuadra ? '' : '<span class="objective-pill">mes sin cuadre</span>'}</td>
     </tr>`).join('');
     return `<div class="panel"><div class="panel-head"><div><div class="panel-title">Día a día</div>
       <div class="panel-sub">Un guion es un día sin dato, no una venta de cero.</div></div></div>
-      <div class="table-scroll"><table><thead><tr><th>Día</th><th class="num">Inversión</th>
+      <div class="table-scroll"><table class="data-table"><thead><tr><th>Día</th><th class="num">Inversión</th>
       <th class="num">Ventas</th><th class="num">Ingresos</th><th></th></tr></thead>
       <tbody>${body || '<tr><td colspan="5" class="table-empty">Sin días para este mes.</td></tr>'}</tbody></table></div></div>`;
   }
@@ -157,12 +162,12 @@
       const sales = rows.reduce((acc, row) => (row[key + '_ventas'] == null ? acc : acc + row[key + '_ventas']), null);
       const amount = rows.reduce((acc, row) => (row[key + '_monto'] == null ? acc : acc + row[key + '_monto']), null);
       const share = sales == null || !total ? null : (sales / total) * 100;
-      return `<tr><td>${esc(label)}</td><td class="num">${esc(f.count(sales))}</td>
-        <td class="num">${esc(f.money(amount))}</td><td class="num">${esc(f.pct(share))}</td></tr>`;
+      return `<tr><td class="campaign-name">${esc(label)}</td>${celda(sales, f.count(sales))}
+        ${celda(amount, f.money(amount))}${celda(share, f.pct(share))}</tr>`;
     }).join('');
     return `<div class="panel"><div class="panel-head"><div><div class="panel-title">Por red</div>
       <div class="panel-sub">El reparto sale de la hoja. La inversión no se reparte por red: la plataforma la cobra por campaña.</div></div></div>
-      <div class="table-scroll"><table><thead><tr><th>Red</th><th class="num">Ventas</th>
+      <div class="table-scroll"><table class="data-table"><thead><tr><th>Red</th><th class="num">Ventas</th>
       <th class="num">Ingresos</th><th class="num">Parte</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
   }
 
