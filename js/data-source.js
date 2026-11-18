@@ -336,6 +336,10 @@
       dataEnd: latest && latest.lastDay ? `${latest.key}-${String(latest.lastDay).padStart(2, '0')}` : null,
       ignored: Array.isArray(payload.ignored) ? payload.ignored.map(item => ({ fileName: String(item?.fileName || ''), reason: String(item?.reason || '') })) : [],
       reports: normalizeReports(payload.reports),
+      // Las ventas viajan tal como las sirve el Web App: su forma la fija el contrato NEXUS_VENTAS_V1
+      // y el modulo la muestra. Si no se copiaran aqui, el estado del tablero las perderia y el
+      // modulo Ventas apareceria vacio aunque el JSON las traiga.
+      ventas: payload.ventas || null,
     };
   }
 
