@@ -3470,3 +3470,83 @@ button.topbar-pill[aria-expanded="true"] .status-chevron {
     margin: 0 auto;
   }
 }
+
+/* Modulo Ventas · el embudo.
+   Mismo dibujo que «De la inversion al lead» del tablero de Nexus: tres etapas que se estrechan.
+   El color es el de la marca, no el azul de Nexus: el modulo tiene que parecer de la casa. El ancho
+   de las figuras no es una escala —no compara soles con conversaciones ni con ventas— y el pie del
+   panel lo dice. */
+.ventas-funnel-panel {
+  margin-top: 18px;
+}
+.ventas-funnel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin: 10px 0;
+}
+.ventas-stage {
+  position: relative;
+}
+.ventas-shape {
+  height: 100px;
+  background: linear-gradient(110deg, var(--brand), #ff9a4d);
+}
+.ventas-shape.shape-one {
+  clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
+}
+.ventas-shape.shape-two {
+  clip-path: polygon(0 10%, 100% 30%, 100% 70%, 0 90%);
+}
+.ventas-shape.shape-three {
+  clip-path: polygon(0 30%, 100% 40%, 100% 60%, 0 70%);
+}
+.ventas-stage > span {
+  display: block;
+  min-height: 30px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.ventas-stage > strong {
+  display: block;
+  margin: 6px 0 10px;
+  color: var(--ink);
+  font-size: 26px;
+}
+.ventas-stage > small {
+  display: block;
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.ventas-aviso {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.ventas-aviso > span {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--brand-border);
+  border-radius: 6px;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 10px;
+  font-weight: 700;
+}
+@media (max-width: 600px) {
+  .ventas-shape {
+    height: 70px;
+  }
+  .ventas-stage > strong {
+    font-size: 18px;
+  }
+  .ventas-stage > span {
+    min-height: 48px;
+    font-size: 10px;
+  }
+}
